@@ -9,6 +9,11 @@ document.addEventListener("DOMContentLoaded", () => {
     let timerId
     let score = 0
 
+    let pressLeft = false
+    let pressRight = false
+    let pressDown = false
+    let pressUp = false
+
     const colors = ["orange", "red", "purple", "green", "blue"]
 
     const lTetromino = [
@@ -75,18 +80,46 @@ document.addEventListener("DOMContentLoaded", () => {
         })
     }
 
-    function control(e) {
-        if (e.keyCode === 37) {
-            moveLeft()
-        } else if (e.keyCode === 38) {
-            rotate()
-        } else if (e.keyCode === 39) {
-            moveRight()
-        } else if (e.keyCode === 40) {
-            moveDown()
+    function control() {
+        if (!timerId) {
+        } else {
+            if (pressLeft) {
+                moveLeft()
+            } else if (pressUp) {
+                rotate()
+            } else if (pressRight) {
+                moveRight()
+            } else if (pressDown) {
+                moveDown()
+            }
         }
     }
-    document.addEventListener("keyup", control)
+
+    function controlKeyDown(e) {
+        if (e.keyCode === 37) {
+            pressLeft = true
+        } else if (e.keyCode === 38) {
+            pressUp = true
+        } else if (e.keyCode === 39) {
+            pressRight = true
+        } else if (e.keyCode === 40) {
+            pressDown = true
+        }
+        control()
+    }
+    function controlKeyUp(e) {
+        if (e.keyCode === 37) {
+            pressLeft = false
+        } else if (e.keyCode === 38) {
+            pressUp = false
+        } else if (e.keyCode === 39) {
+            pressRight = false
+        } else if (e.keyCode === 40) {
+            pressDown = false
+        }
+    }
+    document.addEventListener("keydown", controlKeyDown)
+    document.addEventListener("keyup", controlKeyUp)
 
     function moveDown() {
         undraw()
@@ -103,9 +136,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 )
             )
         ) {
-            current.forEach((index) =>
+            current.forEach((index) => {
                 squares[currentPosition + index].classList.add("taken")
-            )
+                console.log("test")
+            })
             random = nextRandom
             nextRandom = Math.floor(Math.random() * theTetrominoes.length)
             current = theTetrominoes[random][currentRotation]
@@ -235,12 +269,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function gameOver() {
         if (
-            current.some((index) => {
+            current.some((index) =>
                 squares[currentPosition + index].classList.contains("taken")
-            })
+            )
         ) {
             ScoreDisplay.innerHTML = "end"
+            console.log(timerId)
             clearInterval(timerId)
+            timerId = null
+            console.log(timerId)
         }
     }
 })
